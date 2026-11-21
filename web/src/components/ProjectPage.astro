@@ -1,0 +1,197 @@
+---
+import Base from '../layouts/Base.astro';
+import Pic from './Pic.astro';
+import Split from './Split.astro';
+import Lines from './Lines.astro';
+import { t, projectUrl, u, type Lang } from '../i18n';
+import { projects } from '../data/projects';
+
+const { lang, slug } = Astro.props as { lang: Lang; slug: string };
+const s = t(lang);
+const idx = projects.findIndex((x) => x.slug === slug);
+const p = projects[idx];
+const next = projects[(idx + 1) % projects.length];
+const altUrl = projectUrl(lang === 'es' ? 'en' : 'es', p.slug);
+const title = `${p.name} — Victoria Arguello`;
+const nf = (n: number) => n.toLocaleString('en-US');
+const beds = (n: number) => `${n} ${n === 1 ? s.bed1 : s.beds}`;
+const arrow = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true"><path d="M1 8h14M9 2l6 6-6 6" /></svg>';
+const nav = [
+  ['#overview', s.overview], ['#residences', s.residences], ['#amenities', s.amenities],
+  ...(p.views ? [['#views', s.views]] : []), ['#team', s.team],
+];
+const mid = p.views ? Math.floor(p.views.length / 2) : 0;
+---
+<Base lang={lang} title={title} description={p.lead[lang]} altUrl={altUrl} ogImage={p.hero}>
+  <section class="phero" id="top">
+    <div class="phero__img" style={`--pos:${p.heroPos}`}><Pic id={p.hero} eager alt={p.name} /></div>
+    <div class="phero__in">
+      <Split text={p.short} tag="h1" class={p.short.length > 9 ? 'split--m' : ''} />
+    </div>
+    <div class="phero__side wrap" style="padding:0">
+      <p class="label" data-reveal style="--d:500ms">{p.place}</p>
+      <p class="lead-s mw-s" data-reveal style="--d:650ms;margin-top:10px;margin-left:auto">{p.tagline[lang]}</p>
+    </div>
+    <nav class="phero__nav label" aria-label={p.short}>
+      {nav.map(([href, label]) => <a href={href}>{label}</a>)}
+    </nav>
+  </section>
+
+  <section class="t-light pad" id="overview">
+    <Lines />
+    <div class="wrap">
+      <p class="label muted" data-reveal style="margin-bottom:clamp(24px,3vw,50px)">{p.name}</p>
+      <div class="two">
+        <p class="lead" data-reveal>{p.lead[lang]}</p>
+        <div>{p.body.map((b, i) => <p data-reveal style={`--d:${120 + i * 120}ms`}>{b[lang]}</p>)}</div>
+      </div>
+      <div class="figs">
+        {p.figures.map((f, i) => (
+          <div data-reveal style={`--d:${i * 120}ms`}>
+            <span class="num">{f.n}</span>
+            <span class="label muted">{f.l[lang]}</span>
+          </div>
+        ))}
+      </div>
+      <h2 class="label" style="margin-top:clamp(60px,8vw,140px)" data-reveal>{s.facts}</h2>
+      <dl class="facts" style="margin-top:20px">
+        {p.facts.map((f) => (
+          <div data-reveal><dt class="label muted">{f.k[lang]}</dt><dd>{f.v[lang]}</dd></div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <section class="t-sand pad" id="residences">
+    <Lines />
+    <div class="wrap sec-head">
+      <Split text={s.residences} />
+      <p class="lead mw-m" data-reveal>{p.residencesLead[lang]}</p>
+    </div>
+    <div class="car" data-reveal>
+      {p.residenceImgs.map((g, i) => (
+        <figure class:list={['car__item', { 'car__item--w': i % 3 !== 1 }]}>
+          <div class="car__img"><Pic id={g.id} sizes="(max-width: 800px) 80vw, 52vw" alt={g.cap[lang]} /></div>
+          <figcaption class="label muted">{g.cap[lang]}</figcaption>
+        </figure>
+      ))}
+    </div>
+    <div class="wrap">
+      <div class="types">
+        {p.types.map((ty) => {
+          const subject = `${p.short} · ${ty.name}`;
+          return (
+            <details class="type" name="types">
+              <summary>
+                <span class="type__name">{ty.name}</span>
+                <span class="label hide-sm">{beds(ty.beds)}{ty.den ? ` + ${s.den}` : ''} · {ty.baths} {s.baths}</span>
+                <span class="label muted hide-sm">{nf(ty.interior[0])} SF / {ty.interior[1]} m²</span>
+                <span class="round type__ico" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor"><path d="M7 1v12M1 7h12" /></svg></span>
+              </summary>
+              <div class="type__body">
+                <div class="type__plan">
+                  <img src={u(`/media/plans/${ty.plan}.webp`)} alt={`${s.plan} — ${ty.name}`} loading="lazy" decoding="async" />
+                </div>
+                <div class="type__side">
+                  <dl>
+                    <div><dt class="label muted">{s.residences}</dt><dd>{beds(ty.beds)}{ty.den ? ` + ${s.den}` : ''}</dd></div>
+                    <div><dt class="label muted">{s.baths}</dt><dd>{ty.baths} + {s.powder}</dd></div>
+                    <div><dt class="label muted">{s.interior}</dt><dd>{nf(ty.interior[0])} SF / {ty.interior[1]} m²</dd></div>
+                    {ty.total && <div><dt class="label muted">{s.total}</dt><dd>{nf(ty.total[0])} SF / {ty.total[1]} m²</dd></div>}
+                    {ty.levels && <div><dt class="label muted">{s.levels}</dt><dd>{ty.levels}</dd></div>}
+                  </dl>
+                  <div>
+                    <button class="btn label" type="button" data-open="contact" data-subject={subject}>{s.requestPrice}<Fragment set:html={arrow} /></button>
+                  </div>
+                </div>
+              </div>
+            </details>
+          );
+        })}
+      </div>
+      <p class="muted" style="margin-top:20px;font-size:.85em" data-reveal>{p.typesNote[lang]}</p>
+    </div>
+  </section>
+
+  <section class="t-light pad" id="amenities">
+    <Lines />
+    <div class="wrap">
+      <div class="sec-head">
+        <Split text={s.amenities} />
+        <p class="lead mw-m" data-reveal>{p.amenitiesLead[lang]}</p>
+      </div>
+      <div class="mosaic">
+        {p.amenityImgs.map((g) => (
+          <figure>
+            <div class="imove" data-reveal="clip"><Pic id={g.id} sizes="(max-width: 800px) 100vw, 60vw" alt={g.cap[lang]} /></div>
+            <figcaption class="label muted">{g.cap[lang]}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {p.views && (
+    <section class="t-dark pad" id="views">
+      <Lines />
+      <div class="wrap" data-views>
+        <div class="sec-head">
+          <Split text={s.viewsTitle} />
+          <p class="lead mw-m" data-reveal>{s.viewsLead}</p>
+        </div>
+        <div class="views__stage" data-reveal="clip">
+          {p.views.map((lv) => (
+            <img data-src={u(`/media/views/l${lv}-l.webp`)} data-srcset={`${u(`/media/views/l${lv}-s.webp`)} 1100w, ${u(`/media/views/l${lv}-l.webp`)} 2400w`} sizes="100vw" data-level={String(lv)} alt={`${s.level} ${lv}`} decoding="async" />
+          ))}
+        </div>
+        <div class="views__ui">
+          <div class="views__lvl"><span class="label muted">{s.level}</span><span class="num" data-level>{p.views[mid]}</span></div>
+          <div>
+            <input class="range" type="range" min="0" max={p.views.length - 1} step="1" value={mid} aria-label={s.level} />
+            <div class="views__ticks label" aria-hidden="true">{p.views.map((lv) => <span>{lv}</span>)}</div>
+          </div>
+        </div>
+        <p class="muted" style="margin-top:24px;font-size:.85em">{s.viewsNote}</p>
+      </div>
+    </section>
+  )}
+
+  {p.film && (
+    <section class="film">
+      <div class="imove">
+        <video data-auto muted loop playsinline preload="metadata" poster={u(`/media/${p.views ? p.dark : p.hero}-s.webp`)}>
+          <source src={u(p.film)} type="video/mp4" />
+        </video>
+      </div>
+    </section>
+  )}
+
+  <section class="t-light pad" id="team">
+    <Lines />
+    <div class="wrap">
+      <Split text={s.team} />
+      <ul class="team">
+        {p.team.map((m, i) => (
+          <li data-reveal style={`--d:${i * 90}ms`}>
+            <span class="label muted">{m.role[lang]}</span>
+            <span class="lead-s">{m.name}</span>
+          </li>
+        ))}
+      </ul>
+      <div class="cta__body" style="margin-top:clamp(60px,8vw,130px)">
+        <p class="lead mw-m" data-reveal>{s.contactLead}</p>
+        <div data-reveal style="--d:150ms">
+          <button class="btn label" type="button" data-open="contact" data-subject={p.short}>{s.requestPrice}<Fragment set:html={arrow} /></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <a class="nextp" href={projectUrl(lang, next.slug)}>
+    <div class="imove"><Pic id={next.dark} alt="" /></div>
+    <div class="nextp__in">
+      <span class="label">{s.next}</span>
+      <Split text={next.short} tag="span" class={next.short.length > 9 ? 'split--m' : ''} />
+    </div>
+  </a>
+</Base>

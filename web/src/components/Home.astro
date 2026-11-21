@@ -1,0 +1,164 @@
+---
+import Base from '../layouts/Base.astro';
+import Pic from './Pic.astro';
+import Split from './Split.astro';
+import Lines from './Lines.astro';
+import { t, projectUrl, home, u, type Lang } from '../i18n';
+import { projects } from '../data/projects';
+
+const { lang } = Astro.props as { lang: Lang };
+const s = t(lang);
+const title = lang === 'es'
+  ? 'Victoria Arguello — Real estate de lujo en Miami'
+  : 'Victoria Arguello — Luxury real estate in Miami';
+const altUrl = home(lang === 'es' ? 'en' : 'es');
+const spaces = [
+  { id: 'mo/resortpool', w: true, cap: 'Mandarin Oriental · Resort pool' },
+  { id: 'b75/unitaliving', w: false, cap: '75 Broadway · Residence A' },
+  { id: 'mo/level19residentslounge', w: true, cap: 'Mandarin Oriental · Level 19' },
+  { id: 'b75/rooftoppool', w: true, cap: '75 Broadway · Rooftop pool' },
+  { id: 'mo/private-residence-lobby-reception', w: false, cap: 'Mandarin Oriental · Lobby' },
+  { id: 'b75/ownersclubbar', w: true, cap: '75 Broadway · Owners Club' },
+  { id: 'mo/tea-lounge', w: false, cap: 'Mandarin Oriental · Tea lounge' },
+  { id: 'b75/penthouselivingroom', w: true, cap: '75 Broadway · Penthouse' },
+];
+const arrow = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true"><path d="M1 8h14M9 2l6 6-6 6" /></svg>';
+---
+<Base lang={lang} title={title} altUrl={altUrl} isHome>
+  <!-- Hero -->
+  <section class="hero t-light" id="top">
+    <Lines />
+    <div class="hero__content">
+      <div class="hero__video" data-reveal="clip">
+        <video data-auto muted loop playsinline preload="metadata" poster={u('/media/b75/crowndusk-s.webp')}>
+          <source src={u('/media/video/portrait.mp4')} type="video/mp4" />
+        </video>
+      </div>
+      <h1 class="hero__name" aria-label="Victoria Arguello">
+        <Split text="VICTORIA" tag="span" />
+        <Split text="ARGUELLO" tag="span" />
+      </h1>
+      <p class="hero__tag label" data-reveal style="--d:600ms">{s.tagline1}<br />{s.tagline2}</p>
+    </div>
+    <a class="round hero__down" href="#about" aria-label={s.scroll}>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><path d="M7 1v12M2 8l5 5 5-5" /></svg>
+    </a>
+    <div class="hero__panel">
+      <Pic id="b75/hero" eager alt={lang === 'es' ? 'Vista aérea de 75 Broadway y Biscayne Bay' : 'Aerial view of 75 Broadway and Biscayne Bay'} />
+      <div class="hero__scrim"></div>
+      <p class="hero__quote lead">{s.heroQuote}</p>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="t-light pad" id="about">
+    <Lines />
+    <div class="wrap">
+      <Split text={s.aboutTitle} />
+      <div class="about__grid">
+        <div class="about__portrait" data-reveal="clip">
+          <span class="about__mono" aria-hidden="true">VA</span>
+          <span class="label">{s.portraitNote}</span>
+        </div>
+        <div class="about__text">
+          <p class="lead" data-reveal>{s.aboutLead}</p>
+          <div class="about__cols">
+            <p data-reveal style="--d:100ms">{s.aboutP1}</p>
+            <p data-reveal style="--d:200ms">{s.aboutP2}</p>
+          </div>
+          <div data-reveal style="--d:300ms">
+            <button class="btn label" type="button" data-open="contact">{s.enquire}<Fragment set:html={arrow} /></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section class="t-sand pad" id="projects">
+    <Lines />
+    <div class="wrap">
+      <div class="sec-head">
+        <Split text={s.projectsTitle} />
+        <p class="lead mw-m" data-reveal>{s.projectsLead}</p>
+      </div>
+      {projects.map((p, i) => (
+        <article class:list={['proj', { 'proj--flip': i % 2 === 1 }]}>
+          <a class="proj__media imove" href={projectUrl(lang, p.slug)} data-reveal="clip" aria-label={p.name}>
+            <Pic id={i === 0 ? p.hero : p.dark} sizes="(max-width: 800px) 100vw, 66vw" alt={p.name} />
+          </a>
+          <div class="proj__body">
+            <p class="label muted" data-reveal>0{i + 1} — {p.place}</p>
+            <h3 class="proj__title" data-reveal style="--d:80ms">{p.short}</h3>
+            <p class="lead-s" data-reveal style="--d:160ms">{p.tagline[lang]}</p>
+            <div class="proj__meta label muted" data-reveal style="--d:240ms">
+              {p.figures.map((f) => <span>{f.n} {f.l[lang]}</span>)}
+            </div>
+            <div data-reveal style="--d:320ms">
+              <a class="btn label" href={projectUrl(lang, p.slug)}>{s.viewProject}<Fragment set:html={arrow} /></a>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- Video band -->
+  <section class="grow t-sand">
+    <div class="grow__media">
+      <video data-auto muted loop playsinline preload="metadata" poster={u('/media/b75/rooftoppool-s.webp')}>
+        <source src={u('/media/video/reel.mp4')} type="video/mp4" />
+      </video>
+    </div>
+    <div class="grow__text"><p class="lead mw-s">{s.lifeLead}</p></div>
+  </section>
+
+  <!-- Services -->
+  <section class="t-light pad" id="services">
+    <Lines />
+    <div class="wrap">
+      <div class="sec-head">
+        <Split text={s.servicesTitle} />
+        <p class="lead mw-m" data-reveal>{s.servicesLead}</p>
+      </div>
+      <ul class="cols4">
+        {s.serviceList.map(([h, p], i) => (
+          <li data-reveal style={`--d:${i * 110}ms`}>
+            <div style="display:grid;gap:10px">
+              <span class="label muted">0{i + 1}</span>
+              <h3>{h}</h3>
+            </div>
+            <p>{p}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Spaces carousel -->
+  <section class="t-sand pad" id="spaces">
+    <div class="wrap"><Split text={s.galleryTitle} /></div>
+    <div class="car" data-reveal>
+      {spaces.map((g) => (
+        <figure class:list={['car__item', { 'car__item--w': g.w }]}>
+          <div class="car__img"><Pic id={g.id} sizes="(max-width: 800px) 80vw, 52vw" alt={g.cap} /></div>
+          <figcaption class="label muted">{g.cap}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="t-dark pad cta" id="contact-cta">
+    <div class="cta__bg imove"><Pic id="mo/alldaydining-skylineseating" alt="" /></div>
+    <div class="wrap">
+      <Split text={s.contactTitle} />
+      <div class="cta__body">
+        <p class="lead mw-m" data-reveal>{s.contactLead}</p>
+        <div data-reveal style="--d:150ms">
+          <button class="btn label" type="button" data-open="contact">{s.enquire}<Fragment set:html={arrow} /></button>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

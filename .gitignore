@@ -1,0 +1,9 @@
+# Material original de los proyectos (17 GB, incluye documentos internos): no se sube
+/Proyectos para  poner en venta/
+# Notas internas de referencia
+/referencia/
+node_modules/
+dist/
+.astro/
+.DS_Store
+Thumbs.db

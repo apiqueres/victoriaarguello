@@ -1,0 +1,150 @@
+---
+import '@fontsource-variable/unbounded';
+import '@fontsource/cormorant-garamond/300.css';
+import '@fontsource/cormorant-garamond/400.css';
+import '../styles/global.css';
+import { t, home, projectUrl, u, type Lang } from '../i18n';
+import { projects } from '../data/projects';
+import Pic from '../components/Pic.astro';
+
+interface Props { lang: Lang; title: string; description?: string; altUrl: string; isHome?: boolean; ogImage?: string; }
+const { lang, title, description, altUrl, isHome = false, ogImage = 'b75/hero' } = Astro.props;
+const s = t(lang);
+const h = home(lang);
+const desc = description ?? s.siteDesc;
+const site = Astro.site ?? new URL('https://victoriaarguello.com');
+const canonical = new URL(Astro.url.pathname, site).href;
+const alt = new URL(altUrl, site).href;
+const other: Lang = lang === 'es' ? 'en' : 'es';
+const menu = [
+  { href: `${h}#about`, label: s.about, img: 'b75/ownersclub' },
+  ...projects.map((p) => ({ href: projectUrl(lang, p.slug), label: p.short, img: p.hero })),
+  { href: `${h}#services`, label: s.services, img: 'mo/level19residentslounge' },
+  { href: `${h}#spaces`, label: s.galleryTitle, img: 'mo/resortpool' },
+];
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={desc} />
+    <meta name="theme-color" content="#F6F1E7" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={lang} href={canonical} />
+    <link rel="alternate" hreflang={other} href={alt} />
+    <link rel="icon" type="image/svg+xml" href={u('/favicon.svg')} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(u(`/media/${ogImage}-s.webp`), site).href} />
+    <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {import.meta.env.PUBLIC_NOINDEX && <meta name="robots" content="noindex, nofollow" />}
+    <script is:inline>document.documentElement.classList.add('js');</script>
+  </head>
+  <body class:list={[{ 'is-home': isHome }]}>
+    <a class="skip label" href="#main">{s.skip}</a>
+
+    <div class="preloader" id="preloader" aria-hidden="true">
+      <span class="preloader__name">Victoria Arguello</span>
+      <span class="label" data-pre>000</span>
+    </div>
+
+    <header class="header">
+      <div class="header__l">
+        <button class="burger" type="button" data-open="menu" aria-label={s.menu}><i></i><i></i></button>
+        <a class="label hide-sm" href={`${h}#projects`}>{s.projects}</a>
+      </div>
+      <a class="header__logo" href={h}>Victoria Arguello</a>
+      <div class="header__r">
+        <a class="label" href={altUrl} hreflang={other} lang={other}>{s.langSwitch}</a>
+        <button class="label" type="button" data-open="contact">{s.contact}</button>
+      </div>
+    </header>
+
+    <main id="main"><slot /></main>
+
+    <footer class="footer t-light">
+      <p class="footer__name">Victoria Arguello</p>
+      <div class="footer__mid">
+        <button class="btn label" type="button" data-open="contact">{s.enquire}
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true"><path d="M1 8h14M9 2l6 6-6 6" /></svg>
+        </button>
+      </div>
+      <p class="footer__legal">{s.legal}</p>
+      <div class="footer__bar label">
+        <span>© {new Date().getFullYear()} Victoria Arguello · {s.rights}</span>
+        <span>Miami, Florida</span>
+        <a href={altUrl} hreflang={other}>{lang === 'es' ? 'English' : 'Español'}</a>
+      </div>
+    </footer>
+
+    <button class="fab" type="button" data-open="contact" aria-label={s.enquire}>
+      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" aria-hidden="true"><path d="M1.5 3.5h15v11h-15z" /><path d="M1.5 4l7.5 6 7.5-6" /></svg>
+    </button>
+
+    <div class="modal modal--menu t-light" id="menu" role="dialog" aria-modal="true" aria-label={s.menu} aria-hidden="true">
+      <div class="modal__bg" data-close></div>
+      <div class="modal__panel" data-lenis-prevent>
+        <button class="round modal__close" type="button" data-close aria-label={s.close}>
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" /></svg>
+        </button>
+        <nav aria-label={s.menu}>
+          <ul class="menu__list">
+            {menu.map((m, i) => (
+              <li class="menu__item" style={`--i:${i}`}>
+                <a href={m.href}>
+                  <div class="menu__img"><Pic id={m.img} sizes="(max-width: 800px) 60vw, 20vw" /></div>
+                  <span class="label" style="display:block;margin-top:12px">{m.label}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div class="menu__foot label">
+          <a href={h}>{s.home}</a>
+          <a href={altUrl} hreflang={other}>{lang === 'es' ? 'English' : 'Español'}</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal modal--side t-light" id="contact" role="dialog" aria-modal="true" aria-label={s.formTitle} aria-hidden="true">
+      <div class="modal__bg" data-close></div>
+      <div class="modal__panel" data-lenis-prevent>
+        <button class="round modal__close" type="button" data-close aria-label={s.close}>
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" /></svg>
+        </button>
+        <p class="label muted">Victoria Arguello</p>
+        <h2 class="lead" style="margin-top:14px">{s.formTitle}</h2>
+        <span class="chip label" data-chip></span>
+        <form class="form" data-form novalidate={false}>
+          <input type="hidden" name="subject" />
+          <input type="hidden" name="lang" value={lang} />
+          <label class="hp" aria-hidden="true">Company <input type="text" name="company" tabindex="-1" autocomplete="off" /></label>
+          <label class="field"><span class="label muted">{s.name}</span><input type="text" name="name" required maxlength="60" autocomplete="name" /></label>
+          <label class="field"><span class="label muted">{s.phone}</span><input type="tel" name="phone" required maxlength="24" autocomplete="tel" /></label>
+          <label class="field"><span class="label muted">{s.email}</span><input type="email" name="email" required maxlength="80" autocomplete="email" /></label>
+          <label class="field"><span class="label muted">{s.message}</span><textarea name="message" rows="2" maxlength="600"></textarea></label>
+          <label class="check"><input type="checkbox" name="consent" required /><span>{s.consent}</span></label>
+          <div><button class="btn label" type="submit">{s.submit}
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true"><path d="M1 8h14M9 2l6 6-6 6" /></svg>
+          </button></div>
+        </form>
+        <div class="form__ok" role="status">
+          <p class="lead">{s.thanks}</p>
+          <p>{s.thanksText}</p>
+          <p class="label muted">{s.demo}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cursor" aria-hidden="true"></div>
+    <script>
+      import '../scripts/main.ts';
+    </script>
+  </body>
+</html>

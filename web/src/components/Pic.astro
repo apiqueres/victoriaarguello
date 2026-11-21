@@ -1,0 +1,18 @@
+---
+import media from '../data/media.json';
+import { u } from '../i18n';
+const { id, alt = '', sizes = '100vw', eager = false, class: cls = '' } = Astro.props;
+const dim = (media as Record<string, number[]>)[id] ?? [2400, 1350];
+---
+<img
+  class={cls}
+  src={u(`/media/${id}-l.webp`)}
+  srcset={`${u(`/media/${id}-s.webp`)} ${Math.min(1100, dim[0])}w, ${u(`/media/${id}-l.webp`)} ${dim[0]}w`}
+  sizes={sizes}
+  width={dim[0]}
+  height={dim[1]}
+  alt={alt}
+  loading={eager ? 'eager' : 'lazy'}
+  decoding="async"
+  fetchpriority={eager ? 'high' : undefined}
+/>

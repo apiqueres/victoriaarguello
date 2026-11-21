@@ -1,0 +1,9 @@
+---
+const { text, tag: Tag = 'h2', class: cls = '' } = Astro.props;
+const chars = [...String(text)];
+---
+<Tag class={`split ${cls}`} aria-label={text} data-split>
+  {chars.map((ch, i) => ch === ' '
+    ? <span class="split__sp" aria-hidden="true"></span>
+    : <span class="split__l" aria-hidden="true" style={`--i:${i}`}><span>{ch}</span></span>)}
+</Tag>
